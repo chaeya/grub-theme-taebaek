@@ -1,0 +1,60 @@
+#!/bin/bash
+THEME_DIR="/boot/grub/themes"
+THEME_NAME=taebaek
+
+# Check command avalibility
+function has_command() {
+  command -v $1 > /dev/null
+}
+echo -e "\n\t*****************************\n\t*  ${THEME_NAME} - Grub2 Theme  *\n\t*****************************"
+
+# https://en.wikipedia.org/wiki/Display_resolution
+RES=`xrandr --current | grep "*" | head -n 1 | awk -F" " '{print $1}'`
+WIDTH=`xrandr --current | grep "*" | head -n 1 | awk -F" " '{print $1}' | awk -F"x" '{print $1}'`
+# Foced adjust for HIDPI Resolution
+if [ "$WIDTH" -gt "1920" ] ; then
+  # echo "HIDPI"
+  sed -i.bak "s/.*GRUB_GFXMODE.*/GRUB_GFXMODE=1920x1080/g" /etc/default/grub
+else
+  # echo "NORMAL"  
+  sed -i.bak "s/.*GRUB_GFXMODE.*/GRUB_GFXMODE=${RES}/g" /etc/default/grub
+fi
+
+# for hamonikr os  
+if [[ -f "/etc/hamonikr/info" ]] ; then
+  if [ -x "/etc/hamonikr/adjustments/10-adjust-grub-title.execute" ] ; then
+    /etc/hamonikr/adjustments/10-adjust-grub-title.execute
+  else
+    echo "Found HamoniKR OS Infomation"
+    OSNAME=$( sed -n '/GRUB_TITLE=/p' /etc/hamonikr/info | cut -d'=' -f2 | sed 's/"//g' ) >/dev/null 2>&1
+    sed -i '/GRUB_DISTRIBUTOR=/d' /etc/default/grub >/dev/null 2>&1
+    echo "GRUB_DISTRIBUTOR=\"${OSNAME}\"" >> /etc/default/grub
+  fi 
+fi  
+
+# Set theme
+echo -e "Setting ${THEME_NAME} as default..."
+grep "GRUB_THEME=" /etc/default/grub 2>&1 >/dev/null && sed -i '/GRUB_THEME=/d' /etc/default/grub
+sed -i '/GRUB_TIMEOUT=/d' /etc/default/grub >/dev/null 2>&1
+echo "GRUB_TIMEOUT=5" >> /etc/default/grub 
+[[ -d /boot/grub ]] && echo "GRUB_THEME=\"${THEME_DIR}/${THEME_NAME}/theme.txt\"" >> /etc/default/grub
+
+# Update grub config
+echo -e "Updating grub config..."
+if has_command update-grub; then
+    update-grub
+elif has_command grub-mkconfig; then
+    grub-mkconfig -o /boot/grub/grub.cfg
+fi
+
+if which systemctl >/dev/null 2>&1
+then
+    if [ $(systemctl is-enabled hamonikr-system) = "disabled" ] ; then
+      systemctl enable hamonikr-system.service
+      systemctl daemon-reload
+    fi
+fi
+
+# Success message
+echo -e "\n\t*****************************\n\t*  Installation complete.  *\n\t*****************************"    
+exit 0
