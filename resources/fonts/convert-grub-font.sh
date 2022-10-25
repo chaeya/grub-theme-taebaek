@@ -31,10 +31,10 @@ if [ -z "$1" ] || [ -z "$2" ] ; then
 	exit
 fi
 
-grub-mkfont --output="./output/${1##*.}-${2}.pf2" --size=$2 "$1"
+grub-mkfont --output="./output/${1%%.*}-${2}.pf2" --size=$2 "$1"
 
 if [ $? -eq 0 ] ; then
-	echo "Output : $( realpath ./output/${1##*.}-${2}.pf2 )"
+	echo "Output : $( realpath ./output/${1%%.*}-${2}.pf2 )"
 	ls -al ./output
 else
     echo "Failed."
