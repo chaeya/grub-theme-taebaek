@@ -1,5 +1,7 @@
 #!/bin/bash
-THEME_DIR="/boot/grub/themes"
+set -e
+ROOT_UID=0
+THEME_DIR="/usr/share/grub/themes"
 THEME_NAME=taebaek
 
 # Check command avalibility
@@ -11,13 +13,15 @@ echo -e "\n\t*****************************\n\t*  ${THEME_NAME} - Grub2 Theme  *\
 # https://en.wikipedia.org/wiki/Display_resolution
 RES=`xrandr --current | grep "*" | head -n 1 | awk -F" " '{print $1}'`
 WIDTH=`xrandr --current | grep "*" | head -n 1 | awk -F" " '{print $1}' | awk -F"x" '{print $1}'`
-# Foced adjust for HIDPI Resolution
-if [ "$WIDTH" -gt "1920" ] ; then
-  # echo "HIDPI"
-  sed -i.bak "s/.*GRUB_GFXMODE.*/GRUB_GFXMODE=1920x1080/g" /etc/default/grub
-else
-  # echo "NORMAL"  
-  sed -i.bak "s/.*GRUB_GFXMODE.*/GRUB_GFXMODE=${RES}/g" /etc/default/grub
+if [ ! -z "$WIDTH" ] ; then
+  # Foced adjust for HIDPI Resolution
+  if [ "$WIDTH" -gt "1920" ] ; then
+    # echo "HIDPI"
+    sed -i.bak "s/.*GRUB_GFXMODE.*/GRUB_GFXMODE=1920x1080/g" /etc/default/grub
+  else
+    # echo "NORMAL"  
+    sed -i.bak "s/.*GRUB_GFXMODE.*/GRUB_GFXMODE=${RES}/g" /etc/default/grub
+  fi
 fi
 
 # for hamonikr os  
@@ -27,17 +31,24 @@ if [[ -f "/etc/hamonikr/info" ]] ; then
   else
     echo "Found HamoniKR OS Infomation"
     OSNAME=$( sed -n '/GRUB_TITLE=/p' /etc/hamonikr/info | cut -d'=' -f2 | sed 's/"//g' ) >/dev/null 2>&1
-    sed -i '/GRUB_DISTRIBUTOR=/d' /etc/default/grub >/dev/null 2>&1
+    sed -i.bak '/GRUB_DISTRIBUTOR=/d' /etc/default/grub >/dev/null 2>&1
     echo "GRUB_DISTRIBUTOR=\"${OSNAME}\"" >> /etc/default/grub
-  fi 
-fi  
+  fi
+fi
 
-# Set theme
-echo -e "Setting ${THEME_NAME} as default..."
-grep "GRUB_THEME=" /etc/default/grub 2>&1 >/dev/null && sed -i '/GRUB_THEME=/d' /etc/default/grub
-sed -i '/GRUB_TIMEOUT=/d' /etc/default/grub >/dev/null 2>&1
-echo "GRUB_TIMEOUT=5" >> /etc/default/grub 
-[[ -d /boot/grub ]] && echo "GRUB_THEME=\"${THEME_DIR}/${THEME_NAME}/theme.txt\"" >> /etc/default/grub
+if [ -f "/etc/default/grub" ] ; then
+  # Set theme
+  echo -e "Setting ${THEME_NAME} as default..."
+
+  # sed -i.bak '/GRUB_CMDLINE_LINUX_DEFAULT=/d' /etc/default/grub >/dev/null 2>&1
+  # echo "GRUB_CMDLINE_LINUX_DEFAULT=\"quiet splash LANG=ko_KR\"" >> /etc/default/grub   
+
+  grep "GRUB_THEME=" /etc/default/grub 2>&1 >/dev/null && sed -i.bak '/GRUB_THEME=/d' /etc/default/grub
+  [[ -d /boot/grub ]] && echo "GRUB_THEME=\"${THEME_DIR}/${THEME_NAME}/theme.txt\"" >> /etc/default/grub  
+
+  sed -i.bak '/GRUB_TIMEOUT=/d' /etc/default/grub >/dev/null 2>&1
+  echo "GRUB_TIMEOUT=5" >> /etc/default/grub 
+fi
 
 # Update grub config
 echo -e "Updating grub config..."

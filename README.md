@@ -4,10 +4,11 @@
 ![hamonikr-hanla](https://img.shields.io/badge/hamonikr-hanla-purple)
 ![hamonikr-taebaek](https://img.shields.io/badge/hamonikr-taeback-green)
 
-# grub-theme-taebaek
+## grub-theme-taebaek
 
- * 사용자 해상도 자동 감지 후 테마 적용
+ * 사용자 해상도 자동 감지 후 테마 해상도 적용
  * 와이드 스크린의 경우 자동으로 비율을 계산
+ * `D2Coding` , `Terminus` fonts
 
 ## Install
 
@@ -38,21 +39,18 @@ sudo apt install -f ./grub-theme-taebaek_*_amd64.deb
 
 ### How to create grub font
 ```
-cd resources/fonts
-
-# 아래 명령으로 resources/fonts 안에 있는 폰트를 모두 변환해서 ./output 디렉토리에 생성합니다.
-./convert-grub-font.sh all
+sudo grub-mkfont --output=/boot/grub/fonts/NanumGothicCoding.pf2 --size=32 ~/.local/share/fonts/NanumGothicCoding.ttf
 ```
 
-### How to convert png from svg_icons folder
-부팅시 보이는 OS 아이콘을 변경하려면 48 사이즈의 png 파일을 boot/grub/themes/taebaek/icons 안에 넣으세요.
-현재 사용 중인 아이콘은 resources/svg_icons 경로에 있습니다.
-
-### How to convert png from svg_icons folder
+### How to convert png from icons-svg folder
 Use convert-svg-app (https://github.com/hamonikr/convert-svg)
+```
+convert-svg-app
+```
 
-## License
+# License
  * GPL v3
+ 
 
-## 이슈 또는 버그
+ # 이슈 또는 버그
  사용 중 문제를 발견하시면 root@hamonikr.org 또는 https://groups.google.com/forum/m/#!forum/hamonikr 에서 알려주세요.

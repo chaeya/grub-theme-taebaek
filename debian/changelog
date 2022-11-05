@@ -1,5 +1,6 @@
 grub-theme-taebaek (1.0.0) taebaek; urgency=medium
 
-  * Release for HamoniKR 6.0
+  * Release taebaek grub theme
+   - HamoniKR 6.0 LTS taebaek version
 
- -- HamoniKR <pkg@hamonikr.org>  Sun, 23 Oct 2022 14:07:48 +0900
+ -- HamoniKR <pkg@hamonikr.org>  Sun, 06 Nov 2022 04:19:05 +0900
